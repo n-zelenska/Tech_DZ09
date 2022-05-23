@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+     <head>
+        <meta charset="utf-8">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <title>LightCamera</title>
+<style>
+   body{
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+   }
+</style>
+     </head>
+     <body>
+         <canvas id="Canvas"></canvas>
+        <script>
+         var renderer = new THREE.WebGLRenderer(
+         {canvas: document.getElementById('Canvas'), antialias: true});
+         renderer.setClearColor(0x333333);
+         renderer.setPixelRatio(window.devicePixelRatio);
+         renderer.setSize(window.innerWidth, window.innerHeight);
+
+         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+         //перспективна камера
+         var camera=new THREE.PerspectiveCamera(35,
+         window.innerWidth / window.innerHeight, 0.1, 20000);
+         camera.position.z = 500;
+         //ортографічна камера
+
+         var camera = new THREE.OrthographicCamera(-300, 300, 200, -200, 0.1, 2000);
+
+
+
+         var scene = new THREE.Scene();
+         var conegeometry = new THREE.CylinderGeometry(100,200,100,500);
+         var conematerial = new THREE.MeshLambertMaterial();
+         var conemesh = new THREE.Mesh(conegeometry, conematerial);
+         conemesh.position.set(-150, -50, -500);
+         conemesh.rotation.x = -100;
+         scene.add(conemesh);
+
+         var cubegeometry = new THREE.BoxGeometry(90, 100, 90, 200);
+         var cubematerial = new THREE.MeshLambertMaterial();
+         var cubemesh = new THREE.Mesh(cubegeometry, cubematerial);
+         cubemesh.position.set(200, -50, -500);
+         cubemesh.rotation.x = -100;
+         scene.add(cubemesh);
+         var planegeometry = new THREE.PlaneGeometry(900, 500, 300, 900);
+         var planematerial = new THREE.MeshPhongMaterial(
+         {color: 0x333333});
+         var planemesh = new THREE.Mesh(planegeometry, planematerial);
+        planemesh.position.set(50, -70, -500);
+         planemesh.rotation.set(-290, 0, 0);
+
+         scene.add(planemesh);
+
+         var secondCamera = new THREE.PerspectiveCamera(35,
+        window.innerWidth / window.innerHeight, 0.1, 20000);
+        var cameraHelper = new THREE.CameraHelper(secondCamera);
+        scene.add(cameraHelper);
+
+         //рівномірне освітлення
+         // var lightOne = new THREE.AmbientLight(0xfffff, 0.5);
+         // lightOne.position.z = 300;
+         // scene.add(lightOne);
+
+         // точкове освітлення
+        //  var lightOne = new THREE.PointLight(0xfffff, 0.5);
+        // scene.add(lightOne);
+
+        //  //напрямлене освітлення
+        var lightOne = new THREE.DirectionalLight(0xffff, 0.5, 1000);
+        lightOne.target = conemesh;
+        scene.add(lightOne);
+
+        var lightHelper= new THREE.DirectionalLightHelper(lightOne, 100);
+        scene.add(lightHelper);
+        lightHelper.update();
+
+         //прожекторне освітлення
+        //  var lightOne = new THREE.SpotLight(0xfffff, 0.5, 1000);
+        // lightOne.target = conemesh;
+        // scene.add(lightOne);
+
+         //напівсферичне освітлення
+        // var lightOne = new THREE.HemisphereLight(0xfffff, 0x080820, 1);
+        // scene.add(lightOne);
+
+         //відкидання тіней
+
+        //  var lightOne = new THREE.SpotLight(0xfffff, 2.0, 3000);
+        // lightOne.position.x = 50;
+        // lightOne.target = conemesh;
+        // lightOne.castShadow = true;
+
+        // scene.add(lightOne);
+
+        // var shadowcamera = new THREE.PerspectiveCamera(100, 1, 500, 1000);
+        // lightOne.shadow = new THREE.LightShadow(shadowcamera);
+
+        conemesh.castShadow = true;
+        cubemesh.castShadow = true;
+        planemesh.receiveShadow = true;
+
+         requestAnimationFrame(render);
+
+         var angle=0;
+         function render() {
+            // lightOne.position.y = 300*Math.sin(angle);
+            // lightOne.position.z = 300*Math.sin(angle);
+            angle += 0.01;  
+            camera.lookAt(lightOne.position);
+            camera.position.x = Math.sin(angle) * 2000;
+            camera.position.z = Math.cos(angle) * 2000;         
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+         }
+        </script>
+     </body>
+</html>
